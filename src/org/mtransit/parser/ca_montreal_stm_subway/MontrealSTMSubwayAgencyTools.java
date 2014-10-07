@@ -23,7 +23,7 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		if (args == null || args.length == 0) {
 			args = new String[3];
 			args[0] = "input/gtfs.zip";
-			args[1] = "../ca-montreal-stm-subway/res/raw/";
+			args[1] = "../ca-montreal-stm-subway-android/res/raw/";
 			args[2] = ""; // files-prefix
 		}
 		new MontrealSTMSubwayAgencyTools().start(args);
@@ -76,17 +76,19 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String getRouteShortName(GRoute gRoute) {
-		return ""; // no route short name
+		return null; // no route short name
 	}
 
 	@Override
 	public String getStopCode(GStop gStop) {
-		return ""; // no stop code
+		return null; // no stop code
 	}
+
+	private static final String COLOR_WHITE = "FFFFFF";
 
 	@Override
 	public String getRouteTextColor(GRoute gRoute) {
-		return "FFFFFF"; // 000000 doesn't contrast well
+		return COLOR_WHITE; // better contrast
 	}
 
 	private static final String ANGRIGNON = "Angrignon";
