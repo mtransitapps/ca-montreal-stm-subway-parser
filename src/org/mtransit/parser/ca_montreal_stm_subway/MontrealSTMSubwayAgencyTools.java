@@ -2,6 +2,7 @@ package org.mtransit.parser.ca_montreal_stm_subway;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.Utils;
@@ -10,6 +11,7 @@ import org.mtransit.parser.gtfs.data.GCalendarDate;
 import org.mtransit.parser.gtfs.data.GRoute;
 import org.mtransit.parser.gtfs.data.GStop;
 import org.mtransit.parser.gtfs.data.GTrip;
+import org.mtransit.parser.mt.data.MSpec;
 import org.mtransit.parser.mt.data.MTrip;
 
 // http:www.stm.info/en/about/developers
@@ -140,20 +142,11 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		return super.mergeHeadsign(mTrip, mTripToMerge);
 	}
 
-	private static final String PLACE_CHAR_STATION = "station";
-	private static final int PLACE_CHAR_STATION_LENGTH = PLACE_CHAR_STATION.length();
-	private static final String PLACE_CHAR_STATION_BIG = "Station";
-	private static final int PLACE_CHAR_STATION_BIG_LENGTH = PLACE_CHAR_STATION_BIG.length();
+	private static final Pattern STATION = Pattern.compile("(station)", Pattern.CASE_INSENSITIVE);
 
 	@Override
-	public String cleanStopName(String gStopName) {
-		String result = gStopName;
-		if (result.startsWith(PLACE_CHAR_STATION)) {
-			result = result.substring(PLACE_CHAR_STATION_LENGTH);
-		}
-		if (result.startsWith(PLACE_CHAR_STATION_BIG)) {
-			result = result.substring(PLACE_CHAR_STATION_BIG_LENGTH);
-		}
+	public String cleanStopName(String result) {
+		result = STATION.matcher(result).replaceAll(MSpec.SPACE);
 		return super.cleanStopName(result);
 	}
 
