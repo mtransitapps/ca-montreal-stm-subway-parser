@@ -87,10 +87,45 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	}
 
 	private static final String COLOR_WHITE = "FFFFFF";
+	private static final String COLOR_BLACK = "000000";
 
 	@Override
 	public String getRouteTextColor(GRoute gRoute) {
-		return COLOR_WHITE; // better contrast
+		switch (getRouteId(gRoute)) {
+		case 1:
+			return COLOR_WHITE;
+		case 2:
+			return COLOR_WHITE;
+		case 4:
+			return COLOR_BLACK;
+		case 5:
+			return COLOR_WHITE;
+		default:
+			System.out.println(String.format("Unexpected route '%s', using source color.", gRoute));
+			return super.getRouteColor(gRoute);
+		}
+	}
+
+	private static final String COLOR_GREEN = "008449"; // "008E4F"; // instead of 00B300
+	private static final String COLOR_ORANGE = "F58220"; // "F08123"; // instead of D95700
+	private static final String COLOR_YELLOW = "FFE400"; // FFE400"; // instead of FFD900
+	private static final String COLOR_BLUE = "009EE0"; // "0083CA"; // instead of 0095E6
+
+	@Override
+	public String getRouteColor(GRoute gRoute) {
+		switch (getRouteId(gRoute)) {
+		case 1:
+			return COLOR_GREEN;
+		case 2:
+			return COLOR_ORANGE;
+		case 4:
+			return COLOR_YELLOW;
+		case 5:
+			return COLOR_BLUE;
+		default:
+			System.out.println(String.format("Unexpected route '%s', using source color.", gRoute));
+			return super.getRouteColor(gRoute);
+		}
 	}
 
 	private static final String ANGRIGNON = "Angrignon";
