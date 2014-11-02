@@ -19,13 +19,14 @@ import org.mtransit.parser.mt.data.MTrip;
 public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	public static final String ROUTE_TYPE_FILTER = "1"; // subway only
-	public static final String SERVICE_ID_FILTER = "14S"; // TODO use calendar
+
+	public static final String SERVICE_ID_FILTER = "14N"; // TODO use calendar
 
 	public static void main(String[] args) {
 		if (args == null || args.length == 0) {
 			args = new String[3];
 			args[0] = "input/gtfs.zip";
-			args[1] = "../ca-montreal-stm-subway-android/res/raw/";
+			args[1] = "../../mtransitapps/ca-montreal-stm-subway-android/res/raw/";
 			args[2] = ""; // files-prefix
 		}
 		new MontrealSTMSubwayAgencyTools().start(args);
