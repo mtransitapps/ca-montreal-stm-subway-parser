@@ -40,8 +40,13 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		System.out.printf("Generating STM subway data... DONE in %s.\n", Utils.getPrettyDuration(System.currentTimeMillis() - start));
 	}
 
+	private static final String ROUTE_ID_FILTER = null;
+
 	@Override
 	public boolean excludeRoute(GRoute gRoute) {
+		if (ROUTE_ID_FILTER != null && !gRoute.route_id.equals(ROUTE_ID_FILTER)) {
+			return true;
+		}
 		if (ROUTE_TYPE_FILTER != null && !gRoute.route_type.equals(ROUTE_TYPE_FILTER)) {
 			return true;
 		}
@@ -50,6 +55,9 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean excludeTrip(GTrip gTrip) {
+		if (ROUTE_ID_FILTER != null && !gTrip.getRouteId().equals(ROUTE_ID_FILTER)) {
+			return true;
+		}
 		if (SERVICE_ID_FILTER != null && !gTrip.service_id.contains(SERVICE_ID_FILTER)) {
 			return true;
 		}
