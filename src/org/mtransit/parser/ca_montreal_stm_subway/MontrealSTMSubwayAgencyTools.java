@@ -11,6 +11,7 @@ import org.mtransit.parser.gtfs.data.GCalendarDate;
 import org.mtransit.parser.gtfs.data.GRoute;
 import org.mtransit.parser.gtfs.data.GStop;
 import org.mtransit.parser.gtfs.data.GTrip;
+import org.mtransit.parser.mt.data.MRoute;
 import org.mtransit.parser.mt.data.MSpec;
 import org.mtransit.parser.mt.data.MTrip;
 
@@ -81,7 +82,7 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	}
 
 	@Override
-	public int getRouteId(GRoute gRoute) {
+	public long getRouteId(GRoute gRoute) {
 		return Integer.valueOf(gRoute.route_short_name); // use route short name instead of route ID
 	}
 
@@ -100,19 +101,21 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String getRouteTextColor(GRoute gRoute) {
-		switch (getRouteId(gRoute)) {
-		case 1:
+		long routeId = getRouteId(gRoute);
+		if (routeId == 1) {
 			return COLOR_WHITE;
-		case 2:
-			return COLOR_WHITE;
-		case 4:
-			return COLOR_BLACK;
-		case 5:
-			return COLOR_WHITE;
-		default:
-			System.out.println(String.format("Unexpected route '%s', using source color.", gRoute));
-			return super.getRouteColor(gRoute);
 		}
+		if (routeId == 2) {
+			return COLOR_WHITE;
+		}
+		if (routeId == 4) {
+			return COLOR_BLACK;
+		}
+		if (routeId == 5) {
+			return COLOR_WHITE;
+		}
+		System.out.println(String.format("Unexpected route '%s', using source color.", gRoute));
+		return super.getRouteColor(gRoute);
 	}
 
 	private static final String COLOR_GREEN = "008449"; // "008E4F"; // instead of 00B300
@@ -122,19 +125,21 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String getRouteColor(GRoute gRoute) {
-		switch (getRouteId(gRoute)) {
-		case 1:
+		long routeId = getRouteId(gRoute);
+		if (routeId == 1) {
 			return COLOR_GREEN;
-		case 2:
-			return COLOR_ORANGE;
-		case 4:
-			return COLOR_YELLOW;
-		case 5:
-			return COLOR_BLUE;
-		default:
-			System.out.println(String.format("Unexpected route '%s', using source color.", gRoute));
-			return super.getRouteColor(gRoute);
 		}
+		if (routeId == 2) {
+			return COLOR_ORANGE;
+		}
+		if (routeId == 4) {
+			return COLOR_YELLOW;
+		}
+		if (routeId == 5) {
+			return COLOR_BLUE;
+		}
+		System.out.println(String.format("Unexpected route '%s', using source color.", gRoute));
+		return super.getRouteColor(gRoute);
 	}
 
 	private static final String ANGRIGNON = "Angrignon";
@@ -148,7 +153,7 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	private static final String SNOWDON = "Snowdon";
 
 	@Override
-	public void setTripHeadsign(MTrip mTrip, GTrip gTrip) {
+	public void setTripHeadsign(MRoute mRoute, MTrip mTrip, GTrip gTrip) {
 		String stationName = cleanStopName(gTrip.trip_headsign);
 		int directionId = -1;
 		if (stationName.contains(ANGRIGNON)) { // green
