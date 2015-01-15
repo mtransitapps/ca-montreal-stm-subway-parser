@@ -1,14 +1,18 @@
 package org.mtransit.parser.ca_montreal_stm_subway;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.Utils;
+import org.mtransit.parser.gtfs.GReader;
 import org.mtransit.parser.gtfs.data.GCalendar;
 import org.mtransit.parser.gtfs.data.GCalendarDate;
 import org.mtransit.parser.gtfs.data.GRoute;
+import org.mtransit.parser.gtfs.data.GSpec;
 import org.mtransit.parser.gtfs.data.GStop;
 import org.mtransit.parser.gtfs.data.GTrip;
 import org.mtransit.parser.mt.data.MRoute;
@@ -21,7 +25,7 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	public static final String ROUTE_TYPE_FILTER = "1"; // subway only
 
-	public static final String SERVICE_ID_FILTER = "14N"; // TODO use calendar
+	private String startWithFilter;
 
 	public static void main(String[] args) {
 		if (args == null || args.length == 0) {
@@ -37,8 +41,23 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	public void start(String[] args) {
 		System.out.printf("Generating STM subway data...\n");
 		long start = System.currentTimeMillis();
+		extractUsefulServiceIds(args);
 		super.start(args);
 		System.out.printf("Generating STM subway data... DONE in %s.\n", Utils.getPrettyDuration(System.currentTimeMillis() - start));
+	}
+
+	private void extractUsefulServiceIds(String[] args) {
+		System.out.printf("Extracting useful service IDs...\n");
+		GSpec gtfs = GReader.readGtfsZipFile(args[0], this);
+		Integer todayStringInt = Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(new Date()));
+		for (GCalendarDate gCalendarDate : gtfs.calendarDates) {
+			if (gCalendarDate.date == todayStringInt) {
+				this.startWithFilter = gCalendarDate.service_id.substring(0, 3);
+			}
+		}
+		System.out.println("Filter: " + this.startWithFilter);
+		gtfs = null;
+		System.out.printf("Extracting useful service IDs... DONE\n");
 	}
 
 	private static final String ROUTE_ID_FILTER = null;
@@ -57,28 +76,37 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	@Override
 	public boolean excludeTrip(GTrip gTrip) {
 		if (ROUTE_ID_FILTER != null && !gTrip.getRouteId().equals(ROUTE_ID_FILTER)) {
-			return true;
+			return true; // exclude
 		}
-		if (SERVICE_ID_FILTER != null && !gTrip.service_id.contains(SERVICE_ID_FILTER)) {
-			return true;
+		if (this.startWithFilter != null) {
+			if (gTrip.service_id.startsWith(this.startWithFilter)) {
+				return false; // keep
+			}
+			return true; // exclude
 		}
-		return false;
+		return super.excludeTrip(gTrip);
 	}
 
 	@Override
 	public boolean excludeCalendarDate(GCalendarDate gCalendarDates) {
-		if (SERVICE_ID_FILTER != null && !gCalendarDates.service_id.contains(SERVICE_ID_FILTER)) {
-			return true;
+		if (this.startWithFilter != null) {
+			if (gCalendarDates.service_id.startsWith(this.startWithFilter)) {
+				return false; // keep
+			}
+			return true; // exclude
 		}
-		return false;
+		return super.excludeCalendarDate(gCalendarDates);
 	}
 
 	@Override
 	public boolean excludeCalendar(GCalendar gCalendar) {
-		if (SERVICE_ID_FILTER != null && !gCalendar.service_id.contains(SERVICE_ID_FILTER)) {
-			return true;
+		if (this.startWithFilter != null) {
+			if (gCalendar.service_id.startsWith(this.startWithFilter)) {
+				return false; // keep
+			}
+			return true; // exclude
 		}
-		return false;
+		return super.excludeCalendar(gCalendar);
 	}
 
 	@Override
