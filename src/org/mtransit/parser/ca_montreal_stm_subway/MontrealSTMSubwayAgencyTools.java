@@ -121,10 +121,10 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		return super.getRouteColor(gRoute);
 	}
 
-	private static final String COLOR_GREEN = "008449"; // "008E4F"; // instead of 00B300
-	private static final String COLOR_ORANGE = "F58220"; // "F08123"; // instead of D95700
-	private static final String COLOR_YELLOW = "FFE400"; // FFE400"; // instead of FFD900
-	private static final String COLOR_BLUE = "009EE0"; // "0083CA"; // instead of 0095E6
+	private static final String COLOR_GREEN = "008449";
+	private static final String COLOR_ORANGE = "E77710";
+	private static final String COLOR_YELLOW = "FFD900";
+	private static final String COLOR_BLUE = "009EE0";
 
 	@Override
 	public String getRouteColor(GRoute gRoute) {
