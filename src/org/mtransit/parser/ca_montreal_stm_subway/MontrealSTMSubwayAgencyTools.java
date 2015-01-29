@@ -95,6 +95,14 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	}
 
 	@Override
+	public String getRouteLongName(GRoute gRoute) {
+		if (gRoute.route_long_name.equals("BLEU")) {
+			return "BLEUE";
+		}
+		return super.getRouteLongName(gRoute);
+	}
+
+	@Override
 	public String getStopCode(GStop gStop) {
 		return null; // no stop code
 	}
