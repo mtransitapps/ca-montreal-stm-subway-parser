@@ -12,6 +12,7 @@ import org.mtransit.parser.gtfs.data.GCalendarDate;
 import org.mtransit.parser.gtfs.data.GRoute;
 import org.mtransit.parser.gtfs.data.GStop;
 import org.mtransit.parser.gtfs.data.GTrip;
+import org.mtransit.parser.mt.data.MAgency;
 import org.mtransit.parser.mt.data.MRoute;
 import org.mtransit.parser.mt.data.MSpec;
 import org.mtransit.parser.mt.data.MTrip;
@@ -19,8 +20,6 @@ import org.mtransit.parser.mt.data.MTrip;
 // http://www.stm.info/en/about/developers
 // http://www.stm.info/sites/default/files/gtfs/gtfs_stm.zip
 public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
-
-	public static final String ROUTE_TYPE_FILTER = "1"; // subway only
 
 	public static void main(String[] args) {
 		if (args == null || args.length == 0) {
@@ -51,10 +50,12 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		if (ROUTE_ID_FILTER != null && !gRoute.route_id.equals(ROUTE_ID_FILTER)) {
 			return true;
 		}
-		if (ROUTE_TYPE_FILTER != null && !gRoute.route_type.equals(ROUTE_TYPE_FILTER)) {
-			return true;
-		}
 		return super.excludeRoute(gRoute);
+	}
+
+	@Override
+	public Integer getAgencyRouteType() {
+		return MAgency.ROUTE_TYPE_SUBWAY;
 	}
 
 	@Override
