@@ -42,17 +42,6 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		System.out.printf("Generating STM subway data... DONE in %s.\n", Utils.getPrettyDuration(System.currentTimeMillis() - start));
 	}
 
-
-	private static final String ROUTE_ID_FILTER = null;
-
-	@Override
-	public boolean excludeRoute(GRoute gRoute) {
-		if (ROUTE_ID_FILTER != null && !gRoute.route_id.equals(ROUTE_ID_FILTER)) {
-			return true;
-		}
-		return super.excludeRoute(gRoute);
-	}
-
 	@Override
 	public Integer getAgencyRouteType() {
 		return MAgency.ROUTE_TYPE_SUBWAY;
@@ -60,9 +49,6 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean excludeTrip(GTrip gTrip) {
-		if (ROUTE_ID_FILTER != null && !gTrip.getRouteId().equals(ROUTE_ID_FILTER)) {
-			return true; // exclude
-		}
 		if (this.serviceIds != null) {
 			return excludeUselessTrip(gTrip, this.serviceIds);
 		}
@@ -95,10 +81,13 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		return null; // no route short name
 	}
 
+	private static final String BLEU = "BLEU";
+	private static final String BLEUE = "BLEUE";
+
 	@Override
 	public String getRouteLongName(GRoute gRoute) {
-		if (gRoute.route_long_name.equals("BLEU")) {
-			return "BLEUE";
+		if (BLEU.equals(gRoute.route_long_name)) {
+			return BLEUE;
 		}
 		return super.getRouteLongName(gRoute);
 	}
@@ -135,8 +124,9 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		if (routeId == 5) {
 			return COLOR_BLUE;
 		}
-		System.out.println(String.format("Unexpected route '%s', using source color.", gRoute));
-		return super.getRouteColor(gRoute);
+		System.out.println(String.format("Unexpected route '%s'", gRoute));
+		System.exit(-1);
+		return null;
 	}
 
 	private static final String ANGRIGNON = "Angrignon";
@@ -195,5 +185,4 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		result = STATION.matcher(result).replaceAll(MSpec.SPACE);
 		return super.cleanStopName(result);
 	}
-
 }
