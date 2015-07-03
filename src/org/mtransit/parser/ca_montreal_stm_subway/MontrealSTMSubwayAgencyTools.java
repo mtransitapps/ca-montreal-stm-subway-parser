@@ -3,6 +3,7 @@ package org.mtransit.parser.ca_montreal_stm_subway;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.mtransit.parser.DefaultAgencyTools;
@@ -113,16 +114,13 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	@Override
 	public String getRouteColor(GRoute gRoute) {
 		long routeId = getRouteId(gRoute);
-		if (routeId == 1) {
+		if (routeId == 1l) {
 			return COLOR_GREEN;
-		}
-		if (routeId == 2) {
+		} else if (routeId == 2l) {
 			return COLOR_ORANGE;
-		}
-		if (routeId == 4) {
+		} else if (routeId == 4l) {
 			return COLOR_YELLOW;
-		}
-		if (routeId == 5) {
+		} else if (routeId == 5l) {
 			return COLOR_BLUE;
 		}
 		System.out.println(String.format("Unexpected route '%s'", gRoute));
@@ -130,41 +128,58 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		return null;
 	}
 
-	private static final String ANGRIGNON = "Angrignon";
-	private static final String HONORE_BEAUGRAND = "Honoré-Beaugrand";
-	private static final String COTE_VERTU = "Côte-Vertu";
-	private static final String MONTMORENCY = "Montmorency";
-	private static final String HENRI_BOURASSA = "Henri-Bourassa";
-	private static final String BERRI_UQAM = "Berri-UQAM";
-	private static final String LONGUEUIL_UNIVERSITE = "Longueuil-Université";
-	private static final String SAINT_MICHEL = "Saint-Michel";
-	private static final String SNOWDON = "Snowdon";
+	private static final String ANGRIGNON = "angrignon";
+	private static final String HONORE_BEAUGRAND = "honoré-beaugrand";
+	private static final String COTE_VERTU = "côte-vertu";
+	private static final String MONTMORENCY = "montmorency";
+	private static final String HENRI_BOURASSA = "henri-bourassa";
+	private static final String BERRI_UQAM = "berri-uqam";
+	private static final String BERRI_UQAM2 = "berri-uqàm";
+	private static final String LONGUEUIL_UNIVERSITE = "longueuil-université";
+	private static final String LONGUEUIL_UNIVERSITE2 = "longueuil–université";
+	private static final String SAINT_MICHEL = "saint-michel";
+	private static final String SNOWDON = "snowdon";
 
 	@Override
 	public void setTripHeadsign(MRoute mRoute, MTrip mTrip, GTrip gTrip, GSpec gtfs) {
-		String stationName = cleanStopName(gTrip.trip_headsign);
+		String tripHeadsignLC = gTrip.trip_headsign.toLowerCase(Locale.ENGLISH);
 		int directionId = -1;
-		if (stationName.contains(ANGRIGNON)) { // green
-			directionId = 0;
-		} else if (stationName.contains(HONORE_BEAUGRAND)) { // green
-			directionId = 1;
-		} else if (stationName.contains(COTE_VERTU)) { // orange
-			directionId = 0;
-		} else if (stationName.contains(MONTMORENCY) || stationName.contains(HENRI_BOURASSA)) { // orange
-			directionId = 1;
-		} else if (stationName.contains(BERRI_UQAM)) { // yellow
-			directionId = 0;
-		} else if (stationName.contains(LONGUEUIL_UNIVERSITE)) { // yellow
-			directionId = 1;
-		} else if (stationName.contains(SAINT_MICHEL)) { // blue
-			directionId = 0;
-		} else if (stationName.contains(SNOWDON)) { // blue
-			directionId = 1;
-		} else {
-			System.out.println("Unexpected station: " + stationName + " (headsign: " + gTrip.trip_headsign + ")");
+		if (mRoute.id == 1l) {
+			if (tripHeadsignLC.contains(ANGRIGNON)) { // green
+				directionId = 0;
+			} else if (tripHeadsignLC.contains(HONORE_BEAUGRAND)) { // green
+				directionId = 1;
+			}
+		} else if (mRoute.id == 2l) {
+			if (tripHeadsignLC.contains(COTE_VERTU)) { // orange
+				directionId = 0;
+			} else if (tripHeadsignLC.contains(MONTMORENCY) || tripHeadsignLC.contains(HENRI_BOURASSA)) { // orange
+				directionId = 1;
+			}
+		} else if (mRoute.id == 4l) {
+			if (tripHeadsignLC.contains(BERRI_UQAM) || tripHeadsignLC.contains(BERRI_UQAM2)) { // yellow
+				directionId = 0;
+			} else if (tripHeadsignLC.contains(LONGUEUIL_UNIVERSITE) || tripHeadsignLC.contains(LONGUEUIL_UNIVERSITE2)) { // yellow
+				directionId = 1;
+			}
+		} else if (mRoute.id == 5l) {
+			if (tripHeadsignLC.contains(SAINT_MICHEL)) { // blue
+				directionId = 0;
+			} else if (tripHeadsignLC.contains(SNOWDON)) { // blue
+				directionId = 1;
+			}
+		}
+		if (directionId < 0) {
+			System.out.println("Unexpected trip: " + gTrip);
 			System.exit(-1);
 		}
-		mTrip.setHeadsignString(stationName, directionId);
+		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.trip_headsign), directionId);
+	}
+
+	@Override
+	public String cleanTripHeadsign(String tripHeadsign) {
+		tripHeadsign = STATION.matcher(tripHeadsign).replaceAll(MSpec.SPACE);
+		return MSpec.cleanLabel(tripHeadsign);
 	}
 
 	private static List<String> MMHB = Arrays.asList(new String[] { MONTMORENCY, HENRI_BOURASSA });
@@ -172,7 +187,8 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
-		if (MMHB.contains(mTrip.getHeadsignValue()) && MMHB.contains(mTripToMerge.getHeadsignValue())) {
+		String tripHeadsignLC = mTrip.getHeadsignValue().toLowerCase(Locale.ENGLISH);
+		if (MMHB.contains(tripHeadsignLC) && MMHB.contains(mTripToMerge.getHeadsignValue().toLowerCase(Locale.ENGLISH))) {
 			mTrip.setHeadsignString(MMHB_HV, mTrip.getHeadsignId());
 			return true;
 		}
@@ -182,8 +198,8 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	private static final Pattern STATION = Pattern.compile("(station)", Pattern.CASE_INSENSITIVE);
 
 	@Override
-	public String cleanStopName(String result) {
-		result = STATION.matcher(result).replaceAll(MSpec.SPACE);
-		return super.cleanStopName(result);
+	public String cleanStopName(String stopName) {
+		stopName = STATION.matcher(stopName).replaceAll(MSpec.SPACE);
+		return super.cleanStopName(stopName);
 	}
 }
