@@ -16,7 +16,7 @@ import org.mtransit.parser.gtfs.data.GStop;
 import org.mtransit.parser.gtfs.data.GTrip;
 import org.mtransit.parser.mt.data.MAgency;
 import org.mtransit.parser.mt.data.MRoute;
-import org.mtransit.parser.mt.data.MSpec;
+import org.mtransit.parser.CleanUtils;
 import org.mtransit.parser.mt.data.MTrip;
 
 // http://www.stm.info/en/about/developers
@@ -37,11 +37,11 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public void start(String[] args) {
-		System.out.printf("Generating STM subway data...\n");
+		System.out.printf("\nGenerating STM subway data...\n");
 		long start = System.currentTimeMillis();
 		this.serviceIds = extractUsefulServiceIds(args, this);
 		super.start(args);
-		System.out.printf("Generating STM subway data... DONE in %s.\n", Utils.getPrettyDuration(System.currentTimeMillis() - start));
+		System.out.printf("\nGenerating STM subway data... DONE in %s.\n", Utils.getPrettyDuration(System.currentTimeMillis() - start));
 	}
 
 	@Override
@@ -178,8 +178,8 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String cleanTripHeadsign(String tripHeadsign) {
-		tripHeadsign = STATION.matcher(tripHeadsign).replaceAll(MSpec.SPACE);
-		return MSpec.cleanLabel(tripHeadsign);
+		tripHeadsign = STATION.matcher(tripHeadsign).replaceAll(CleanUtils.SPACE);
+		return CleanUtils.cleanLabel(tripHeadsign);
 	}
 
 	private static List<String> MMHB = Arrays.asList(new String[] { MONTMORENCY, HENRI_BOURASSA });
@@ -199,7 +199,7 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String cleanStopName(String stopName) {
-		stopName = STATION.matcher(stopName).replaceAll(MSpec.SPACE);
+		stopName = STATION.matcher(stopName).replaceAll(CleanUtils.SPACE);
 		return super.cleanStopName(stopName);
 	}
 }
