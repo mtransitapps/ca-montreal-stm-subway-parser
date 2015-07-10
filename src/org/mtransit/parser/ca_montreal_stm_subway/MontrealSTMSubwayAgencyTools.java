@@ -37,7 +37,7 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public void start(String[] args) {
-		System.out.printf("\nGenerating STM subway data...\n");
+		System.out.printf("\nGenerating STM subway data...");
 		long start = System.currentTimeMillis();
 		this.serviceIds = extractUsefulServiceIds(args, this);
 		super.start(args);
@@ -176,9 +176,23 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.trip_headsign), directionId);
 	}
 
+	private static final Pattern UQAM = Pattern.compile("(uq[a|à]m)", Pattern.CASE_INSENSITIVE);
+	private static final String UQAM_REPLACEMENT = "UQÀM";
+
+	private static final Pattern UDEM = Pattern.compile("(universit[é|e](\\-| )de(\\-| )montr[é|e]al)", Pattern.CASE_INSENSITIVE);
+	private static final String UDEM_REPLACEMENT = "UdeM";
+
+	private static final Pattern U_DE_S = Pattern.compile("(universit[e|é](\\-| )de(\\-| )sherbrooke)", Pattern.CASE_INSENSITIVE);
+	private static final String U_DE_S_REPLACEMENT = "UdeS";
+
 	@Override
 	public String cleanTripHeadsign(String tripHeadsign) {
+		tripHeadsign = tripHeadsign.toLowerCase(Locale.ENGLISH);
+		tripHeadsign = UQAM.matcher(tripHeadsign).replaceAll(UQAM_REPLACEMENT);
+		tripHeadsign = U_DE_S.matcher(tripHeadsign).replaceAll(U_DE_S_REPLACEMENT);
 		tripHeadsign = STATION.matcher(tripHeadsign).replaceAll(CleanUtils.SPACE);
+		tripHeadsign = CleanUtils.SAINT.matcher(tripHeadsign).replaceAll(CleanUtils.SAINT_REPLACEMENT);
+		tripHeadsign = CleanUtils.cleanStreetTypesFRCA(tripHeadsign);
 		return CleanUtils.cleanLabel(tripHeadsign);
 	}
 
@@ -199,7 +213,12 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String cleanStopName(String stopName) {
+		stopName = UQAM.matcher(stopName).replaceAll(UQAM_REPLACEMENT);
+		stopName = UDEM.matcher(stopName).replaceAll(UDEM_REPLACEMENT);
+		stopName = U_DE_S.matcher(stopName).replaceAll(U_DE_S_REPLACEMENT);
 		stopName = STATION.matcher(stopName).replaceAll(CleanUtils.SPACE);
+		stopName = CleanUtils.SAINT.matcher(stopName).replaceAll(CleanUtils.SAINT_REPLACEMENT);
+		stopName = CleanUtils.cleanStreetTypesFRCA(stopName);
 		return super.cleanStopName(stopName);
 	}
 }
