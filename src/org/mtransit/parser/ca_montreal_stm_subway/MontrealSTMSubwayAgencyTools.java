@@ -75,7 +75,7 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public long getRouteId(GRoute gRoute) {
-		return Integer.valueOf(gRoute.route_short_name); // use route short name instead of route ID
+		return Integer.valueOf(gRoute.getRouteShortName()); // use route short name instead of route ID
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String getRouteLongName(GRoute gRoute) {
-		if (BLEU.equals(gRoute.route_long_name)) {
+		if (BLEU.equals(gRoute.getRouteLongName())) {
 			return BLEUE;
 		}
 		return super.getRouteLongName(gRoute);
@@ -123,7 +123,7 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		} else if (routeId == 5l) {
 			return COLOR_BLUE;
 		}
-		System.out.println(String.format("Unexpected route '%s'", gRoute));
+		System.out.printf("\nUnexpected route color '%s'", gRoute);
 		System.exit(-1);
 		return null;
 	}
@@ -142,7 +142,7 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public void setTripHeadsign(MRoute mRoute, MTrip mTrip, GTrip gTrip, GSpec gtfs) {
-		String tripHeadsignLC = gTrip.trip_headsign.toLowerCase(Locale.ENGLISH);
+		String tripHeadsignLC = gTrip.getTripHeadsign().toLowerCase(Locale.ENGLISH);
 		int directionId = -1;
 		if (mRoute.id == 1l) {
 			if (tripHeadsignLC.contains(ANGRIGNON)) { // green
@@ -170,10 +170,10 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 			}
 		}
 		if (directionId < 0) {
-			System.out.println("Unexpected trip: " + gTrip);
+			System.out.printf("\nUnexpected trip: %s", gTrip);
 			System.exit(-1);
 		}
-		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.trip_headsign), directionId);
+		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.getTripHeadsign()), directionId);
 	}
 
 	private static final Pattern UQAM = Pattern.compile("(uq[a|à]m)", Pattern.CASE_INSENSITIVE);
