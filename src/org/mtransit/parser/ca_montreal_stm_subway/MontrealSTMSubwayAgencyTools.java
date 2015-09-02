@@ -25,10 +25,11 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	public static void main(String[] args) {
 		if (args == null || args.length == 0) {
-			args = new String[3];
+			args = new String[4];
 			args[0] = "input/gtfs.zip";
 			args[1] = "../../mtransitapps/ca-montreal-stm-subway-android/res/raw/";
 			args[2] = ""; // files-prefix
+			args[3] = Boolean.TRUE.toString(); // generate stop times from frequencies
 		}
 		new MontrealSTMSubwayAgencyTools().start(args);
 	}
