@@ -145,25 +145,25 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	public void setTripHeadsign(MRoute mRoute, MTrip mTrip, GTrip gTrip, GSpec gtfs) {
 		String tripHeadsignLC = gTrip.getTripHeadsign().toLowerCase(Locale.ENGLISH);
 		int directionId = -1;
-		if (mRoute.id == 1l) {
+		if (mRoute.getId() == 1l) {
 			if (tripHeadsignLC.contains(ANGRIGNON)) { // green
 				directionId = 0;
 			} else if (tripHeadsignLC.contains(HONORE_BEAUGRAND)) { // green
 				directionId = 1;
 			}
-		} else if (mRoute.id == 2l) {
+		} else if (mRoute.getId() == 2l) {
 			if (tripHeadsignLC.contains(COTE_VERTU)) { // orange
 				directionId = 0;
 			} else if (tripHeadsignLC.contains(MONTMORENCY) || tripHeadsignLC.contains(HENRI_BOURASSA)) { // orange
 				directionId = 1;
 			}
-		} else if (mRoute.id == 4l) {
+		} else if (mRoute.getId() == 4l) {
 			if (tripHeadsignLC.contains(BERRI_UQAM) || tripHeadsignLC.contains(BERRI_UQAM2)) { // yellow
 				directionId = 0;
 			} else if (tripHeadsignLC.contains(LONGUEUIL_UNIVERSITE) || tripHeadsignLC.contains(LONGUEUIL_UNIVERSITE2)) { // yellow
 				directionId = 1;
 			}
-		} else if (mRoute.id == 5l) {
+		} else if (mRoute.getId() == 5l) {
 			if (tripHeadsignLC.contains(SAINT_MICHEL)) { // blue
 				directionId = 0;
 			} else if (tripHeadsignLC.contains(SNOWDON)) { // blue
