@@ -34,6 +34,11 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		new MontrealSTMSubwayAgencyTools().start(args);
 	}
 
+	@Override
+	public int getThreadPoolSize() { // DEBUG
+		return 4; // DEBUG
+	}
+
 	private HashSet<String> serviceIds;
 
 	@Override
