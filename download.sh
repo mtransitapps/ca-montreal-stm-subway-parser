@@ -1,14 +1,13 @@
 #!/bin/bash
+source ../commons/commons.sh
 echo ">> Downloading..."
 URL=`cat input_url`;
-FILENAME=$(basename "$URL");
-if [ -e input/gtfs.zip ]; then
-    mv input/gtfs.zip $FILENAME;
-    wget --header="User-Agent: MonTransit" --timeout=60 --tries=6 -N $URL;
-else
-    wget --header="User-Agent: MonTransit" --timeout=60 --tries=6 -S $URL;
-fi;
-if [ -e $FILENAME ]; then
-	mv $FILENAME input/gtfs.zip;
-fi;
+mkdir -p input;
+download $URL "input/gtfs.zip";
+checkResult $?;
+if [ -e "input_url_next" ]; then
+	URL=`cat input_url_next`;
+	download $URL "input/gtfs_next.zip";
+	checkResult $?;
+fi
 echo ">> Downloading... DONE"
