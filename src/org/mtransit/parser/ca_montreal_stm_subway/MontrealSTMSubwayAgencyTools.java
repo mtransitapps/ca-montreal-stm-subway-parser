@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.Utils;
 import org.mtransit.parser.gtfs.data.GCalendar;
@@ -230,9 +231,11 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	}
 
 	private static final Pattern STATION = Pattern.compile("(station)", Pattern.CASE_INSENSITIVE);
+	private static final Pattern ENDS_WITH_DIGITS = Pattern.compile("( [\\d]+$)", Pattern.CASE_INSENSITIVE);
 
 	@Override
 	public String cleanStopName(String stopName) {
+		stopName = ENDS_WITH_DIGITS.matcher(stopName).replaceAll(StringUtils.EMPTY);
 		stopName = UQAM.matcher(stopName).replaceAll(UQAM_REPLACEMENT);
 		stopName = UDEM.matcher(stopName).replaceAll(UDEM_REPLACEMENT);
 		stopName = U_DE_S.matcher(stopName).replaceAll(U_DE_S_REPLACEMENT);
