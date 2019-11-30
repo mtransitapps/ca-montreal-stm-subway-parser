@@ -1,5 +1,4 @@
 *.class
-bin/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -11,7 +10,20 @@ bin/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/bin/
+/build/
+/input/
+/output/
 
-# I/O
-input/
-output/
+src/main/java/org/mtransit/parser/*/Stops.java
+
+# Shared files
+/build.gradle
+/change_directory
+/download.sh
+/list_change.sh
+/parse_current.sh
+/parse_next.sh
+/parse_pre_current.sh
+/parse_pre_next.sh
+/unzip_gtfs.sh
