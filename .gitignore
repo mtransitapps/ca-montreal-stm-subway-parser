@@ -24,6 +24,7 @@ src/main/java/org/mtransit/parser/*/Stops.java
 /list_change.sh
 /parse_current.sh
 /parse_next.sh
+/parse_pre.awk
 /parse_pre_current.sh
 /parse_pre_next.sh
 /unzip_gtfs.sh
