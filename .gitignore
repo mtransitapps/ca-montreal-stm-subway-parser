@@ -24,6 +24,8 @@ src/main/java/org/mtransit/parser/*/Stops.java
 /list_change.sh
 /lookup_routes.sh
 /lookup_trips.sh
+/lookup_stops.sh
+/lookup_stop_times.sh
 /parse_current.sh
 /parse_next.sh
 /parse_pre.awk
