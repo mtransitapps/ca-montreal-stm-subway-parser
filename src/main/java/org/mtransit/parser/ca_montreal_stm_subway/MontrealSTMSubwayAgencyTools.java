@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.Utils;
 import org.mtransit.parser.gtfs.data.GCalendar;
@@ -111,9 +112,10 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		return super.getRouteLongName(gRoute);
 	}
 
+	@NotNull
 	@Override
 	public String getStopCode(GStop gStop) {
-		return null; // no stop code
+		return StringUtils.EMPTY; // no stop code
 	}
 
 	private static final String AGENCY_COLOR = "009EE0";
