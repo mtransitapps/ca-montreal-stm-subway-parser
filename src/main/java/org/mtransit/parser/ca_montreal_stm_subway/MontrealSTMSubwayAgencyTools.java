@@ -1,14 +1,11 @@
 package org.mtransit.parser.ca_montreal_stm_subway;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.mtransit.parser.CleanUtils;
 import org.mtransit.parser.DefaultAgencyTools;
+import org.mtransit.parser.MTLog;
 import org.mtransit.parser.Utils;
 import org.mtransit.parser.gtfs.data.GCalendar;
 import org.mtransit.parser.gtfs.data.GCalendarDate;
@@ -18,8 +15,13 @@ import org.mtransit.parser.gtfs.data.GStop;
 import org.mtransit.parser.gtfs.data.GTrip;
 import org.mtransit.parser.mt.data.MAgency;
 import org.mtransit.parser.mt.data.MRoute;
-import org.mtransit.parser.CleanUtils;
 import org.mtransit.parser.mt.data.MTrip;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 // http://www.stm.info/en/about/developers
 // http://www.stm.info/sites/default/files/gtfs/gtfs_stm.zip
@@ -45,11 +47,11 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public void start(String[] args) {
-		System.out.printf("\nGenerating STM subway data...");
+		MTLog.log("Generating STM subway data...");
 		long start = System.currentTimeMillis();
 		this.serviceIds = extractUsefulServiceIds(args, this, true);
 		super.start(args);
-		System.out.printf("\nGenerating STM subway data... DONE in %s.\n", Utils.getPrettyDuration(System.currentTimeMillis() - start));
+		MTLog.log("Generating STM subway data... DONE in %s.", Utils.getPrettyDuration(System.currentTimeMillis() - start));
 	}
 
 	@Override
@@ -93,9 +95,10 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public long getRouteId(GRoute gRoute) {
-		return Integer.valueOf(gRoute.getRouteShortName()); // use route short name instead of route ID
+		return Long.parseLong(gRoute.getRouteShortName()); // use route short name instead of route ID
 	}
 
+	@Nullable
 	@Override
 	public String getRouteShortName(GRoute gRoute) {
 		return null; // no route short name
@@ -133,17 +136,16 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	@Override
 	public String getRouteColor(GRoute gRoute) {
 		long routeId = getRouteId(gRoute);
-		if (routeId == 1l) {
+		if (routeId == 1L) {
 			return COLOR_GREEN;
-		} else if (routeId == 2l) {
+		} else if (routeId == 2L) {
 			return COLOR_ORANGE;
-		} else if (routeId == 4l) {
+		} else if (routeId == 4L) {
 			return COLOR_YELLOW;
-		} else if (routeId == 5l) {
+		} else if (routeId == 5L) {
 			return COLOR_BLUE;
 		}
-		System.out.printf("\nUnexpected route color '%s'", gRoute);
-		System.exit(-1);
+		MTLog.logFatal("Unexpected route color '%s'", gRoute);
 		return null;
 	}
 
@@ -163,25 +165,25 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	public void setTripHeadsign(MRoute mRoute, MTrip mTrip, GTrip gTrip, GSpec gtfs) {
 		String tripHeadsignLC = gTrip.getTripHeadsign().toLowerCase(Locale.ENGLISH);
 		int directionId = -1;
-		if (mRoute.getId() == 1l) {
+		if (mRoute.getId() == 1L) {
 			if (tripHeadsignLC.contains(ANGRIGNON_LC)) { // green
 				directionId = 0;
 			} else if (tripHeadsignLC.contains(HONORE_BEAUGRAND_LC)) { // green
 				directionId = 1;
 			}
-		} else if (mRoute.getId() == 2l) {
+		} else if (mRoute.getId() == 2L) {
 			if (tripHeadsignLC.contains(COTE_VERTU_LC)) { // orange
 				directionId = 0;
 			} else if (tripHeadsignLC.contains(MONTMORENCY_LC) || tripHeadsignLC.contains(HENRI_BOURASSA_LC)) { // orange
 				directionId = 1;
 			}
-		} else if (mRoute.getId() == 4l) {
+		} else if (mRoute.getId() == 4L) {
 			if (tripHeadsignLC.contains(BERRI_UQAM_LC) || tripHeadsignLC.contains(BERRI_UQAM2_LC)) { // yellow
 				directionId = 0;
 			} else if (tripHeadsignLC.contains(LONGUEUIL_UNIVERSITE_LC) || tripHeadsignLC.contains(LONGUEUIL_UNIVERSITE2_LC)) { // yellow
 				directionId = 1;
 			}
-		} else if (mRoute.getId() == 5l) {
+		} else if (mRoute.getId() == 5L) {
 			if (tripHeadsignLC.contains(SAINT_MICHEL_LC)) { // blue
 				directionId = 0;
 			} else if (tripHeadsignLC.contains(SNOWDON_LC)) { // blue
@@ -189,24 +191,25 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 			}
 		}
 		if (directionId < 0) {
-			System.out.printf("\nUnexpected trip: %s", gTrip);
-			System.exit(-1);
+			MTLog.logFatal("Unexpected trip: %s", gTrip);
 		}
 		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.getTripHeadsign()), directionId);
 	}
 
-	private static final Pattern UQAM = Pattern.compile("(uq[a|à]m)", Pattern.CASE_INSENSITIVE);
-	private static final String UQAM_REPLACEMENT = "UQÀM";
+	private static final Pattern UQAM = CleanUtils.cleanWords("uq[a|à]m");
+	private static final String UQAM_REPLACEMENT = CleanUtils.cleanWordsReplacement("UQÀM");
 
-	private static final Pattern UDEM = Pattern.compile("(universit[é|e](\\-| )de(\\-| )montr[é|e]al)", Pattern.CASE_INSENSITIVE);
-	private static final String UDEM_REPLACEMENT = "UdeM";
+	private static final Pattern UDEM = CleanUtils.cleanWords("universit[é|e][-| ]de[-| ]montr[é|e]al");
+	private static final String UDEM_REPLACEMENT = CleanUtils.cleanWordsReplacement("UdeM");
 
-	private static final Pattern U_DE_S = Pattern.compile("(universit[e|é](\\-| )de(\\-| )sherbrooke)", Pattern.CASE_INSENSITIVE);
-	private static final String U_DE_S_REPLACEMENT = "UdeS";
+	private static final Pattern U_DE_S = CleanUtils.cleanWords("universit[e|é][-| ]de[-| ]sherbrooke");
+	private static final String U_DE_S_REPLACEMENT = CleanUtils.cleanWordsReplacement("UdeS");
 
 	@Override
 	public String cleanTripHeadsign(String tripHeadsign) {
-		tripHeadsign = tripHeadsign.toLowerCase(Locale.ENGLISH);
+		if (Utils.isUppercaseOnly(tripHeadsign, true, true)) {
+			tripHeadsign = tripHeadsign.toLowerCase(Locale.ENGLISH);
+		}
 		tripHeadsign = UQAM.matcher(tripHeadsign).replaceAll(UQAM_REPLACEMENT);
 		tripHeadsign = U_DE_S.matcher(tripHeadsign).replaceAll(U_DE_S_REPLACEMENT);
 		tripHeadsign = STATION.matcher(tripHeadsign).replaceAll(CleanUtils.SPACE);
@@ -227,8 +230,7 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 				return true;
 			}
 		}
-		System.out.printf("\nUnexpected trips to merge %s & %s!\n", mTrip, mTripToMerge);
-		System.exit(-1);
+		MTLog.logFatal("Unexpected trips to merge %s & %s!", mTrip, mTripToMerge);
 		return false;
 	}
 
