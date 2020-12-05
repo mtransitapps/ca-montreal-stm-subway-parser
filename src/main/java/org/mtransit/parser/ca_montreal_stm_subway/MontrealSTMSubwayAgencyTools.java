@@ -17,9 +17,7 @@ import org.mtransit.parser.mt.data.MAgency;
 import org.mtransit.parser.mt.data.MRoute;
 import org.mtransit.parser.mt.data.MTrip;
 
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -153,51 +151,12 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		return null;
 	}
 
-	private static final String ANGRIGNON_LC = "angrignon";
-	private static final String HONORE_BEAUGRAND_LC = "honoré-beaugrand";
-	private static final String COTE_VERTU_LC = "côte-vertu";
-	private static final String MONTMORENCY_LC = "montmorency";
-	private static final String HENRI_BOURASSA_LC = "henri-bourassa";
-	private static final String BERRI_UQAM_LC = "berri-uqam";
-	private static final String BERRI_UQAM2_LC = "berri-uqàm";
-	private static final String LONGUEUIL_UNIVERSITE_LC = "longueuil-université";
-	private static final String LONGUEUIL_UNIVERSITE2_LC = "longueuil–université";
-	private static final String SAINT_MICHEL_LC = "saint-michel";
-	private static final String SNOWDON_LC = "snowdon";
-
 	@Override
 	public void setTripHeadsign(@NotNull MRoute mRoute, @NotNull MTrip mTrip, @NotNull GTrip gTrip, @NotNull GSpec gtfs) {
-		String tripHeadsignLC = gTrip.getTripHeadsign().toLowerCase(Locale.ENGLISH);
-		int directionId = -1;
-		if (mRoute.getId() == 1L) {
-			if (tripHeadsignLC.contains(ANGRIGNON_LC)) { // green
-				directionId = 0;
-			} else if (tripHeadsignLC.contains(HONORE_BEAUGRAND_LC)) { // green
-				directionId = 1;
-			}
-		} else if (mRoute.getId() == 2L) {
-			if (tripHeadsignLC.contains(COTE_VERTU_LC)) { // orange
-				directionId = 0;
-			} else if (tripHeadsignLC.contains(MONTMORENCY_LC) || tripHeadsignLC.contains(HENRI_BOURASSA_LC)) { // orange
-				directionId = 1;
-			}
-		} else if (mRoute.getId() == 4L) {
-			if (tripHeadsignLC.contains(BERRI_UQAM_LC) || tripHeadsignLC.contains(BERRI_UQAM2_LC)) { // yellow
-				directionId = 0;
-			} else if (tripHeadsignLC.contains(LONGUEUIL_UNIVERSITE_LC) || tripHeadsignLC.contains(LONGUEUIL_UNIVERSITE2_LC)) { // yellow
-				directionId = 1;
-			}
-		} else if (mRoute.getId() == 5L) {
-			if (tripHeadsignLC.contains(SAINT_MICHEL_LC)) { // blue
-				directionId = 0;
-			} else if (tripHeadsignLC.contains(SNOWDON_LC)) { // blue
-				directionId = 1;
-			}
-		}
-		if (directionId < 0) {
-			MTLog.logFatal("Unexpected trip: %s", gTrip);
-		}
-		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.getTripHeadsign()), directionId);
+		mTrip.setHeadsignString(
+				cleanTripHeadsign(gTrip.getTripHeadsign()),
+				gTrip.getDirectionIdOrDefault()
+		);
 	}
 
 	private static final Pattern UQAM = CleanUtils.cleanWords("uq[a|à]m");
@@ -224,19 +183,13 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	}
 
 	@Override
+	public boolean directionFinderEnabled() {
+		return true;
+	}
+
+	@Override
 	public boolean mergeHeadsign(@NotNull MTrip mTrip, @NotNull MTrip mTripToMerge) {
-		List<String> headsignsValues = Arrays.asList(mTrip.getHeadsignValue(), mTripToMerge.getHeadsignValue());
-		if (mTrip.getRouteId() == 2L) {
-			if (Arrays.asList( //
-					"Henri-Bourassa", //
-					"Montmorency" //
-			).containsAll(headsignsValues)) {
-				mTrip.setHeadsignString("Montmorency", mTrip.getHeadsignId());
-				return true;
-			}
-		}
-		MTLog.logFatal("Unexpected trips to merge %s & %s!", mTrip, mTripToMerge);
-		return false;
+		throw new MTLog.Fatal("%s: Using direction finder to merge %s and %s!", mTrip.getRouteId(), mTrip, mTripToMerge);
 	}
 
 	private static final Pattern STATION = Pattern.compile("(station)", Pattern.CASE_INSENSITIVE);
