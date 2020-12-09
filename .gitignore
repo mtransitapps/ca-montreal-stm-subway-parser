@@ -25,6 +25,8 @@ src/main/java/org/mtransit/parser/*/Stops.java
 /build.gradle
 /change_directory
 /download.sh
+/force_single_thread_off.sh
+/force_single_thread_on.sh
 /list_change.sh
 /lookup_frequencies.sh
 /lookup_routes.sh
