@@ -36,11 +36,7 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		new MontrealSTMSubwayAgencyTools().start(args);
 	}
 
-	@Override
-	public int getThreadPoolSize() { // DEBUG
-		return 4; // DEBUG
-	}
-
+	@Nullable
 	private HashSet<Integer> serviceIds;
 
 	@Override
@@ -55,11 +51,6 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	@Override
 	public boolean excludingAll() {
 		return this.serviceIds != null && this.serviceIds.isEmpty();
-	}
-
-	@Override
-	public boolean excludeRoute(@NotNull GRoute gRoute) {
-		return super.excludeRoute(gRoute);
 	}
 
 	@NotNull
@@ -147,20 +138,16 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		} else if (routeId == 5L) {
 			return COLOR_BLUE;
 		}
-		MTLog.logFatal("Unexpected route color '%s'", gRoute);
-		return null;
+		throw new MTLog.Fatal("Unexpected route color '%s'", gRoute);
 	}
 
 	@Override
 	public void setTripHeadsign(@NotNull MRoute mRoute, @NotNull MTrip mTrip, @NotNull GTrip gTrip, @NotNull GSpec gtfs) {
 		mTrip.setHeadsignString(
-				cleanTripHeadsign(gTrip.getTripHeadsign()),
+				cleanTripHeadsign(gTrip.getTripHeadsignOrDefault()),
 				gTrip.getDirectionIdOrDefault()
 		);
 	}
-
-	private static final Pattern UQAM = CleanUtils.cleanWords("uq[a|à]m");
-	private static final String UQAM_REPLACEMENT = CleanUtils.cleanWordsReplacement("UQÀM");
 
 	private static final Pattern UDEM = CleanUtils.cleanWords("universit[é|e][-| ]de[-| ]montr[é|e]al");
 	private static final String UDEM_REPLACEMENT = CleanUtils.cleanWordsReplacement("UdeM");
@@ -171,12 +158,9 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	@NotNull
 	@Override
 	public String cleanTripHeadsign(@NotNull String tripHeadsign) {
-		if (Utils.isUppercaseOnly(tripHeadsign, true, true)) {
-			tripHeadsign = tripHeadsign.toLowerCase(Locale.ENGLISH);
-		}
-		tripHeadsign = UQAM.matcher(tripHeadsign).replaceAll(UQAM_REPLACEMENT);
+		tripHeadsign = CleanUtils.toLowerCaseUpperCaseWords(Locale.FRENCH, tripHeadsign, "UQAM", "UQAM", "OACI", "IX");
 		tripHeadsign = U_DE_S.matcher(tripHeadsign).replaceAll(U_DE_S_REPLACEMENT);
-		tripHeadsign = STATION.matcher(tripHeadsign).replaceAll(CleanUtils.SPACE);
+		tripHeadsign = STATION_.matcher(tripHeadsign).replaceAll(CleanUtils.SPACE);
 		tripHeadsign = CleanUtils.SAINT.matcher(tripHeadsign).replaceAll(CleanUtils.SAINT_REPLACEMENT);
 		tripHeadsign = CleanUtils.cleanStreetTypesFRCA(tripHeadsign);
 		return CleanUtils.cleanLabel(tripHeadsign);
@@ -192,17 +176,17 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		throw new MTLog.Fatal("%s: Using direction finder to merge %s and %s!", mTrip.getRouteId(), mTrip, mTripToMerge);
 	}
 
-	private static final Pattern STATION = Pattern.compile("(station)", Pattern.CASE_INSENSITIVE);
+	private static final Pattern STATION_ = Pattern.compile("(station )", Pattern.CASE_INSENSITIVE);
 	private static final Pattern ENDS_WITH_DIGITS = Pattern.compile("( [\\d]+$)", Pattern.CASE_INSENSITIVE);
 
 	@NotNull
 	@Override
 	public String cleanStopName(@NotNull String stopName) {
+		stopName = CleanUtils.toLowerCaseUpperCaseWords(Locale.FRENCH, stopName, "UQAM", "UQAM", "OACI", "IX");
 		stopName = ENDS_WITH_DIGITS.matcher(stopName).replaceAll(StringUtils.EMPTY);
-		stopName = UQAM.matcher(stopName).replaceAll(UQAM_REPLACEMENT);
 		stopName = UDEM.matcher(stopName).replaceAll(UDEM_REPLACEMENT);
 		stopName = U_DE_S.matcher(stopName).replaceAll(U_DE_S_REPLACEMENT);
-		stopName = STATION.matcher(stopName).replaceAll(CleanUtils.SPACE);
+		stopName = STATION_.matcher(stopName).replaceAll(CleanUtils.SPACE);
 		stopName = CleanUtils.SAINT.matcher(stopName).replaceAll(CleanUtils.SAINT_REPLACEMENT);
 		stopName = CleanUtils.cleanStreetTypesFRCA(stopName);
 		return super.cleanStopName(stopName);
