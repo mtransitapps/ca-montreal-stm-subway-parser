@@ -19,8 +19,6 @@ hs_err_pid*
 # IntelliJ
 *.iml
 
-src/main/java/org/mtransit/parser/*/Stops.java
-
 # Shared files
 /build.gradle
 /change_directory
@@ -35,7 +33,4 @@ src/main/java/org/mtransit/parser/*/Stops.java
 /lookup_trips.sh
 /parse_current.sh
 /parse_next.sh
-/parse_pre.awk
-/parse_pre_current.sh
-/parse_pre_next.sh
 /unzip_gtfs.sh
