@@ -21,7 +21,6 @@ hs_err_pid*
 
 # Shared files
 /build.gradle
-/change_directory
 /download.sh
 /force_single_thread_off.sh
 /force_single_thread_on.sh
