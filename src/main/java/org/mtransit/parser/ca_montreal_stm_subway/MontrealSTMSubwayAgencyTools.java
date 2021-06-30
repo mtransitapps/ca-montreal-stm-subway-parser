@@ -3,12 +3,9 @@ package org.mtransit.parser.ca_montreal_stm_subway;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.mtransit.parser.CleanUtils;
+import org.mtransit.commons.CleanUtils;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.MTLog;
-import org.mtransit.parser.Utils;
-import org.mtransit.parser.gtfs.data.GCalendar;
-import org.mtransit.parser.gtfs.data.GCalendarDate;
 import org.mtransit.parser.gtfs.data.GRoute;
 import org.mtransit.parser.gtfs.data.GSpec;
 import org.mtransit.parser.gtfs.data.GStop;
@@ -17,70 +14,32 @@ import org.mtransit.parser.mt.data.MAgency;
 import org.mtransit.parser.mt.data.MRoute;
 import org.mtransit.parser.mt.data.MTrip;
 
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-// http://www.stm.info/en/about/developers
-// http://www.stm.info/sites/default/files/gtfs/gtfs_stm.zip
+// https://www.stm.info/en/about/developers
+// https://www.stm.info/sites/default/files/gtfs/gtfs_stm.zip
 public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
-	public static void main(@Nullable String[] args) {
-		if (args == null || args.length == 0) {
-			args = new String[4];
-			args[0] = "input/gtfs.zip";
-			args[1] = "../../mtransitapps/ca-montreal-stm-subway-android/res/raw/";
-			args[2] = ""; // files-prefix
-			args[3] = Boolean.TRUE.toString(); // generate stop times from frequencies
-		}
+	public static void main(@NotNull String[] args) {
 		new MontrealSTMSubwayAgencyTools().start(args);
 	}
 
-	@Nullable
-	private HashSet<Integer> serviceIds;
-
 	@Override
-	public void start(@NotNull String[] args) {
-		MTLog.log("Generating STM subway data...");
-		long start = System.currentTimeMillis();
-		this.serviceIds = extractUsefulServiceIdInts(args, this, true);
-		super.start(args);
-		MTLog.log("Generating STM subway data... DONE in %s.", Utils.getPrettyDuration(System.currentTimeMillis() - start));
+	public boolean defaultExcludeEnabled() {
+		return true;
 	}
 
+	@NotNull
 	@Override
-	public boolean excludingAll() {
-		return this.serviceIds != null && this.serviceIds.isEmpty();
+	public String getAgencyName() {
+		return "STM";
 	}
 
 	@NotNull
 	@Override
 	public Integer getAgencyRouteType() {
 		return MAgency.ROUTE_TYPE_SUBWAY;
-	}
-
-	@Override
-	public boolean excludeTrip(@NotNull GTrip gTrip) {
-		if (this.serviceIds != null) {
-			return excludeUselessTripInt(gTrip, this.serviceIds);
-		}
-		return super.excludeTrip(gTrip);
-	}
-
-	@Override
-	public boolean excludeCalendarDate(@NotNull GCalendarDate gCalendarDates) {
-		if (this.serviceIds != null) {
-			return excludeUselessCalendarDateInt(gCalendarDates, this.serviceIds);
-		}
-		return super.excludeCalendarDate(gCalendarDates);
-	}
-
-	@Override
-	public boolean excludeCalendar(@NotNull GCalendar gCalendar) {
-		if (this.serviceIds != null) {
-			return excludeUselessCalendarInt(gCalendar, this.serviceIds);
-		}
-		return super.excludeCalendar(gCalendar);
 	}
 
 	@Override
