@@ -1,18 +1,15 @@
 package org.mtransit.parser.ca_montreal_stm_subway;
 
-import org.apache.commons.lang3.StringUtils;
+import static org.mtransit.commons.CleanUtils.SPACE;
+import static org.mtransit.commons.StringUtils.EMPTY;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mtransit.commons.CleanUtils;
 import org.mtransit.parser.DefaultAgencyTools;
-import org.mtransit.parser.MTLog;
 import org.mtransit.parser.gtfs.data.GRoute;
-import org.mtransit.parser.gtfs.data.GSpec;
 import org.mtransit.parser.gtfs.data.GStop;
-import org.mtransit.parser.gtfs.data.GTrip;
 import org.mtransit.parser.mt.data.MAgency;
-import org.mtransit.parser.mt.data.MRoute;
-import org.mtransit.parser.mt.data.MTrip;
 
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -68,44 +65,21 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	@NotNull
 	@Override
 	public String getStopCode(@NotNull GStop gStop) {
-		return StringUtils.EMPTY; // no stop code
+		return EMPTY; // no stop code
 	}
 
-	private static final String AGENCY_COLOR = "009EE0";
-
-	@NotNull
 	@Override
-	public String getAgencyColor() {
-		return AGENCY_COLOR;
+	public boolean defaultAgencyColorEnabled() {
+		return true;
 	}
-
-	private static final String COLOR_GREEN = "008449";
-	private static final String COLOR_ORANGE = "E77710";
-	private static final String COLOR_YELLOW = "FFD900";
-	private static final String COLOR_BLUE = null; // same as agency color (009EE0)
 
 	@Nullable
 	@Override
-	public String getRouteColor(@NotNull GRoute gRoute) {
-		long routeId = getRouteId(gRoute);
-		if (routeId == 1L) {
-			return COLOR_GREEN;
-		} else if (routeId == 2L) {
-			return COLOR_ORANGE;
-		} else if (routeId == 4L) {
-			return COLOR_YELLOW;
-		} else if (routeId == 5L) {
-			return COLOR_BLUE;
+	public String fixColor(@Nullable String color) {
+		if (color != null && !color.isEmpty()) {
+			return color; // keep provided colors
 		}
-		throw new MTLog.Fatal("Unexpected route color '%s'", gRoute);
-	}
-
-	@Override
-	public void setTripHeadsign(@NotNull MRoute mRoute, @NotNull MTrip mTrip, @NotNull GTrip gTrip, @NotNull GSpec gtfs) {
-		mTrip.setHeadsignString(
-				cleanTripHeadsign(gTrip.getTripHeadsignOrDefault()),
-				gTrip.getDirectionIdOrDefault()
-		);
+		return super.fixColor(color);
 	}
 
 	private static final Pattern UDEM = CleanUtils.cleanWords("universit[é|e][-| ]de[-| ]montr[é|e]al");
@@ -119,7 +93,7 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	public String cleanTripHeadsign(@NotNull String tripHeadsign) {
 		tripHeadsign = CleanUtils.toLowerCaseUpperCaseWords(Locale.FRENCH, tripHeadsign, "UQAM", "UQAM", "OACI", "IX");
 		tripHeadsign = U_DE_S.matcher(tripHeadsign).replaceAll(U_DE_S_REPLACEMENT);
-		tripHeadsign = STATION_.matcher(tripHeadsign).replaceAll(CleanUtils.SPACE);
+		tripHeadsign = STATION_.matcher(tripHeadsign).replaceAll(SPACE);
 		tripHeadsign = CleanUtils.SAINT.matcher(tripHeadsign).replaceAll(CleanUtils.SAINT_REPLACEMENT);
 		tripHeadsign = CleanUtils.cleanStreetTypesFRCA(tripHeadsign);
 		return CleanUtils.cleanLabel(tripHeadsign);
@@ -130,11 +104,6 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		return true;
 	}
 
-	@Override
-	public boolean mergeHeadsign(@NotNull MTrip mTrip, @NotNull MTrip mTripToMerge) {
-		throw new MTLog.Fatal("%s: Using direction finder to merge %s and %s!", mTrip.getRouteId(), mTrip, mTripToMerge);
-	}
-
 	private static final Pattern STATION_ = Pattern.compile("(station )", Pattern.CASE_INSENSITIVE);
 	private static final Pattern ENDS_WITH_DIGITS = Pattern.compile("( [\\d]+$)", Pattern.CASE_INSENSITIVE);
 
@@ -142,10 +111,10 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	@Override
 	public String cleanStopName(@NotNull String stopName) {
 		stopName = CleanUtils.toLowerCaseUpperCaseWords(Locale.FRENCH, stopName, "UQAM", "UQAM", "OACI", "IX");
-		stopName = ENDS_WITH_DIGITS.matcher(stopName).replaceAll(StringUtils.EMPTY);
+		stopName = ENDS_WITH_DIGITS.matcher(stopName).replaceAll(EMPTY);
 		stopName = UDEM.matcher(stopName).replaceAll(UDEM_REPLACEMENT);
 		stopName = U_DE_S.matcher(stopName).replaceAll(U_DE_S_REPLACEMENT);
-		stopName = STATION_.matcher(stopName).replaceAll(CleanUtils.SPACE);
+		stopName = STATION_.matcher(stopName).replaceAll(SPACE);
 		stopName = CleanUtils.SAINT.matcher(stopName).replaceAll(CleanUtils.SAINT_REPLACEMENT);
 		stopName = CleanUtils.cleanStreetTypesFRCA(stopName);
 		return super.cleanStopName(stopName);
