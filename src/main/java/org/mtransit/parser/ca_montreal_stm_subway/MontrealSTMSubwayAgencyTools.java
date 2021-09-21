@@ -11,6 +11,7 @@ import org.mtransit.parser.gtfs.data.GRoute;
 import org.mtransit.parser.gtfs.data.GStop;
 import org.mtransit.parser.mt.data.MAgency;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -20,6 +21,12 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	public static void main(@NotNull String[] args) {
 		new MontrealSTMSubwayAgencyTools().start(args);
+	}
+
+	@Nullable
+	@Override
+	public List<Locale> getSupportedLanguages() {
+		return LANG_FR_EN;
 	}
 
 	@Override
@@ -40,26 +47,39 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	}
 
 	@Override
-	public long getRouteId(@NotNull GRoute gRoute) {
-		return Long.parseLong(gRoute.getRouteShortName()); // use route short name instead of route ID
+	public boolean defaultRouteIdEnabled() {
+		return true;
 	}
 
-	@Nullable
 	@Override
-	public String getRouteShortName(@NotNull GRoute gRoute) {
-		return null; // no route short name
+	public boolean useRouteShortNameForRouteId() {
+		return true;
 	}
-
-	private static final String BLEU = "BLEU";
-	private static final String BLEUE = "BLEUE";
 
 	@NotNull
 	@Override
-	public String getRouteLongName(@NotNull GRoute gRoute) {
-		if (BLEU.equals(gRoute.getRouteLongName())) {
-			return BLEUE;
+	public String getRouteShortName(@NotNull GRoute gRoute) {
+		return EMPTY; // no route short name
+	}
+
+	@Override
+	public boolean defaultRouteLongNameEnabled() {
+		return false; // route ID used to target Twitter news ...
+	}
+
+	@NotNull
+	@Override
+	public String cleanRouteShortName(@NotNull String routeShortName) {
+		return super.cleanRouteShortName(routeShortName);
+	}
+
+	@NotNull
+	@Override
+	public String cleanRouteLongName(@NotNull String routeLongName) {
+		if ("BLEU".equals(routeLongName)) {
+			return "BLEUE";
 		}
-		return super.getRouteLongName(gRoute);
+		return super.cleanRouteLongName(routeLongName);
 	}
 
 	@NotNull
