@@ -53,7 +53,7 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean useRouteShortNameForRouteId() {
-		return true;
+		return false; // route ID == default route short name
 	}
 
 	@NotNull
