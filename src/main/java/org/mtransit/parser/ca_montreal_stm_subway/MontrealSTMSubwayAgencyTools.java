@@ -82,6 +82,11 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 		return super.cleanRouteLongName(routeLongName);
 	}
 
+	@Override
+	public boolean forceStopTimeFirstNoDropOffLastNoPickupType() {
+		return true; // agency do not provide info
+	}
+
 	@NotNull
 	@Override
 	public String getStopCode(@NotNull GStop gStop) {
