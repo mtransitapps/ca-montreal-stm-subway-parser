@@ -26,6 +26,7 @@ hs_err_pid*
 /force_single_thread_off.sh
 /force_single_thread_on.sh
 /list_change.sh
+/lookup_agency.sh
 /lookup_frequencies.sh
 /lookup_routes.sh
 /lookup_stops.sh
