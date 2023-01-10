@@ -16,7 +16,6 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 // https://www.stm.info/en/about/developers
-// https://www.stm.info/sites/default/files/gtfs/gtfs_stm.zip
 public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 
 	public static void main(@NotNull String[] args) {
