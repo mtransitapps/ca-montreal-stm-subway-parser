@@ -125,7 +125,7 @@ public class MontrealSTMSubwayAgencyTools extends DefaultAgencyTools {
 	}
 
 	private static final Pattern STATION_ = Pattern.compile("(station )", Pattern.CASE_INSENSITIVE);
-	private static final Pattern ENDS_WITH_DIGITS = Pattern.compile("( [\\d]+$)", Pattern.CASE_INSENSITIVE);
+	private static final Pattern ENDS_WITH_DIGITS = Pattern.compile("( \\d+$)", Pattern.CASE_INSENSITIVE);
 
 	@NotNull
 	@Override
